@@ -1,4 +1,7 @@
 import { FC, useEffect, useState } from "react";
+import { IsMobile } from "../utils/utils";
+import { useCard } from "../context/Cards";
+import Carousel from "./caroussel";
 
 interface props {
   video: React.RefObject<HTMLVideoElement>;
@@ -6,8 +9,7 @@ interface props {
 
 const Video: FC<props> = ({ video }) => {
   const [error, setError] = useState<string>("");
-
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const { GetLoading, GetImages } = useCard();
 
   const constraints: MediaStreamConstraints = {
     video: {
@@ -21,7 +23,7 @@ const Video: FC<props> = ({ video }) => {
         ideal: 1080,
         max: 1440,
       },
-      facingMode: isMobile ? "environment" : "user",
+      facingMode: IsMobile() ? "environment" : "user",
     },
     audio: false,
   };
@@ -37,6 +39,14 @@ const Video: FC<props> = ({ video }) => {
     }
   };
 
+  const classNameLoading = () => {
+    return GetLoading() ? "animate-pulse" : "";
+  };
+
+  const hidden = (condition: boolean) => {
+    return condition ? " hidden" : "";
+  };
+
   useEffect(() => {
     getMedia();
   }, []);
@@ -46,7 +56,19 @@ const Video: FC<props> = ({ video }) => {
       {error != "" ? (
         <p className="font-bold m-auto p-10 w-3/4 text-center">{error}</p>
       ) : (
-        <video ref={video} autoPlay playsInline className="rounded-lg" />
+        <div>
+          <video
+            ref={video}
+            autoPlay
+            playsInline
+            className={
+              "rounded-lg " +
+              classNameLoading() +
+              hidden(GetImages().length > 0)
+            }
+          />
+          <Carousel className={hidden(GetImages().length == 0)} />
+        </div>
       )}
     </div>
   );

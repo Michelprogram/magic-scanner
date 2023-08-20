@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  api:
+    container_name: magic-scanner-api
+    build: .
+    ports:
+      - "3333:3333"
+    volumes:
+      - .:/go/src/app

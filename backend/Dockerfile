@@ -5,8 +5,6 @@
 # to try and check it out!
 #####
 FROM golang:latest
-LABEL maintainer="Hiromu Ochiai <otiai10@gmail.com>"
-
 RUN apt-get update -qq
 
 # You need librariy files and headers of tesseract and leptonica.
@@ -29,7 +27,7 @@ RUN apt-get install -y -qq \
 # downloaded traineddata under ${TESSDATA_PREFIX}/tessdata.
 
 # Setup your cool project with go.mod.
-WORKDIR ${GOPATH}/src/github.com/ghost/cool-project
+WORKDIR /go/src/app
 RUN go mod init
 COPY . .
 
@@ -40,4 +38,4 @@ RUN go get -t github.com/otiai10/gosseract/v2
 # For other OS, check https://github.com/otiai10/gosseract/tree/main/test/runtimes
 
 # Try `docker run -it --rm otiai10/gosseract` to test this environment.
-CMD go run main.go
+CMD go run cmd/main.go
