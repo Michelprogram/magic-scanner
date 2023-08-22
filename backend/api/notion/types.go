@@ -33,6 +33,19 @@ type Type struct {
 	Type   string `json:"type"`
 	Select any    `json:"select"`
 }
+
+type RichText struct {
+	Type        string      `json:"type"`
+	Text        Text        `json:"text"`
+	Annotations Annotations `json:"annotations"`
+	PlainText   string      `json:"plain_text"`
+	Href        any         `json:"href"`
+}
+type ID struct {
+	ID       string     `json:"id"`
+	Type     string     `json:"type"`
+	RichText []RichText `json:"rich_text"`
+}
 type Cardmarket struct {
 	ID   string `json:"id"`
 	Type string `json:"type"`
@@ -85,6 +98,7 @@ type Properties struct {
 	Image      Image      `json:"Image"`
 	Duplicate  Duplicate  `json:"Duplicate"`
 	Name       Name       `json:"Name"`
+	Id         ID         `json:"id"`
 }
 type Row struct {
 	Object         string       `json:"object"`

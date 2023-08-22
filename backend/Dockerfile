@@ -1,41 +1,20 @@
-#####
-# This is a working example of setting up tesseract/gosseract,
-# and also works as an example runtime to use gosseract package.
-# You can just hit `docker run -it --rm otiai10/gosseract`
-# to try and check it out!
-#####
-FROM golang:latest
-RUN apt-get update -qq
+# Première étape : construire l'application
+FROM golang:1.19-alpine AS builder
 
-# You need librariy files and headers of tesseract and leptonica.
-# When you miss these or LD_LIBRARY_PATH is not set to them,
-# you would face an error: "tesseract/baseapi.h: No such file or directory"
-RUN apt-get install -y -qq libtesseract-dev libleptonica-dev
+WORKDIR /app
 
-# In case you face TESSDATA_PREFIX error, you minght need to set env vars
-# to specify the directory where "tessdata" is located.
-ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
-
-# Load languages.
-# These {lang}.traineddata would b located under ${TESSDATA_PREFIX}/tessdata.
-RUN apt-get install -y -qq \
-    tesseract-ocr-eng \
-    tesseract-ocr-deu \
-    tesseract-ocr-jpn
-# See https://github.com/tesseract-ocr/tessdata for the list of available languages.
-# If you want to download these traineddata via `wget`, don't forget to locate
-# downloaded traineddata under ${TESSDATA_PREFIX}/tessdata.
-
-# Setup your cool project with go.mod.
-WORKDIR /go/src/app
-RUN go mod init
 COPY . .
+RUN cd server && go mod download
 
-# Let's have gosseract in your project and test it.
-RUN go get -t github.com/otiai10/gosseract/v2
+RUN cd server && CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app cmd/main.go
 
-# Now, you've got complete environment to play with "gosseract"!
-# For other OS, check https://github.com/otiai10/gosseract/tree/main/test/runtimes
+# Deuxième étape : créer une image légère
+FROM alpine:latest
 
-# Try `docker run -it --rm otiai10/gosseract` to test this environment.
-CMD go run cmd/main.go
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+COPY --from=builder /app/server/app .
+
+CMD ["./app"]

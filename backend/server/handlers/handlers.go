@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/google/uuid"
 	"github.com/michelprogram/magic-scanner/api/notion"
@@ -14,7 +15,7 @@ import (
 	"github.com/michelprogram/magic-scanner/utils"
 )
 
-var storage = make(map[string]*Response)
+var storage = sync.Map{}
 
 var NOTION_TOKEN = os.Getenv("NOTION_TOKEN")
 var VISION_TOKEN = os.Getenv("VISION_TOKEN")
@@ -31,6 +32,10 @@ type AddPayload struct {
 type Response struct {
 	Id    string          `json:"id"`
 	Cards *scryfall.Cards `json:"cards"`
+}
+
+func Hello(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello World!")
 }
 
 func Scanner(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +84,7 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 		Cards: cards,
 	}
 
-	storage[id] = &response
+	storage.Store(id, &response)
 
 	js, _ := json.Marshal(response)
 
@@ -89,8 +94,6 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 
 func Add(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("Test : ", storage)
-
 	var payload AddPayload
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
@@ -98,14 +101,26 @@ func Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	card := storage[payload.Id].Cards.Data[payload.Index]
+	response, ok := storage.Load(payload.Id)
+
+	if !ok {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		return
+	}
+
+	card := response.(Response).Cards.Data[payload.Index]
 
 	notion := notion.NewNotion(NOTION_TOKEN, "7ed3432e626d439597fac0810734b5dd")
 
 	err = notion.AddCard(card)
 
 	if err != nil {
-		fmt.Println(err.Error())
+		http.Error(w, "Error while adding to notion", http.StatusBadRequest)
+		return
 	}
+
+	storage.Delete(payload.Id)
+
+	fmt.Fprintf(w, "Added")
 
 }

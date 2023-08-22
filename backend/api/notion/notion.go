@@ -23,14 +23,14 @@ func NewNotion(token, databaseid string) *Notion {
 	return &Notion{Token: token, DatabaseId: databaseid, Version: "2022-06-28"}
 }
 
-func (n Notion) IsCardExist(name string) (*Row, error) {
+func (n Notion) IsCardExist(id string) (*Row, error) {
 	url := fmt.Sprintf("https://api.notion.com/v1/databases/%s/query", n.DatabaseId)
 
 	payload := map[string]map[string]interface{}{
 		"filter": {
-			"property": "Name",
-			"title": map[string]string{
-				"equals": name,
+			"property": "id",
+			"rich_text": map[string]string{
+				"equals": id,
 			},
 		},
 	}
@@ -53,15 +53,15 @@ func (n Notion) IsCardExist(name string) (*Row, error) {
 	}
 	defer res.Body.Close()
 
+	if res.StatusCode != 200 {
+		body, _ = io.ReadAll(res.Body)
+		return nil, errors.New("Error check if card already exists" + string(body))
+	}
+
 	var result Results
 	err = json.NewDecoder(res.Body).Decode(&result)
 	if err != nil {
 		return nil, err
-	}
-
-	if res.StatusCode != 200 {
-		body, _ = io.ReadAll(res.Body)
-		return nil, errors.New("Error adding card to Notion: %s" + string(body))
 	}
 
 	if len(result.Results) == 0 {
@@ -103,7 +103,7 @@ func (n Notion) UpdateDuplicateProperty(row Row) error {
 
 	if res.StatusCode != 200 {
 		body, _ = io.ReadAll(res.Body)
-		return errors.New("Error adding card to Notion: %s" + string(body))
+		return errors.New("Error update duplicate property : " + string(body))
 	}
 
 	return nil
@@ -141,6 +141,16 @@ func (n Notion) AddRow(card scryfall.Card) error {
 				"type": "select",
 				"select": map[string]string{
 					"name": card.TypeLine,
+				},
+			},
+			"id": map[string]interface{}{
+				"type": "rich_text",
+				"rich_text": []map[string]interface{}{
+					{
+						"text": map[string]string{
+							"content": card.ID,
+						},
+					},
 				},
 			},
 			"Cardmarket": map[string]interface{}{
@@ -185,7 +195,7 @@ func (n Notion) AddRow(card scryfall.Card) error {
 
 	if res.StatusCode != 200 {
 		body, _ = io.ReadAll(res.Body)
-		return errors.New("Error adding card to Notion: %s" + string(body))
+		return errors.New("Error adding card to Notion: " + string(body))
 	}
 
 	return nil
@@ -193,17 +203,17 @@ func (n Notion) AddRow(card scryfall.Card) error {
 
 func (n Notion) AddCard(card scryfall.Card) error {
 
-	result, error := n.IsCardExist(card.Name)
+	result, error := n.IsCardExist(card.ID)
 
 	if error != nil {
 		return error
 	}
 
 	if result != nil {
+		println("Already exist")
 		n.UpdateDuplicateProperty(*result)
 		return nil
 	}
 
 	return n.AddRow(card)
-
 }

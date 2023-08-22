@@ -1,5 +1,6 @@
 import { useContext, createContext, useState } from "react";
 import { IsMobile } from "../utils/utils";
+import { useToast } from "../components/ui/use-toast";
 
 type CardProviderProps = {
   children: React.ReactNode;
@@ -11,6 +12,11 @@ type Card = {
     normal: string;
     png: string;
   };
+};
+
+type Confirmation = {
+  id: string;
+  index: number;
 };
 
 export type Cards = {
@@ -25,14 +31,11 @@ type CardContext = {
   GetCards(): Card[];
   GetImages(): string[];
 
-  SendConfirmation(): void;
-  FetchCards(base64: string): void;
+  SendConfirmation(index: number): void;
+  FetchCards(base64: string): Promise<void>;
 
   GetLoading(): boolean;
   SetLoading(loading: boolean): void;
-
-  GetSelected(): number;
-  SetSelected(index: number): void;
 };
 
 const CardContext = createContext<CardContext>({} as CardContext);
@@ -43,54 +46,67 @@ export function useCard() {
 
 export function CardProvider({ children }: CardProviderProps) {
   const [data, setData] = useState<Cards>();
-  const [selected, setSelected] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+
+  const { toast } = useToast();
 
   const Clear = () => {
     setData(undefined);
   };
 
-  const FetchCards = async (base64: string) => {
+  const FetchCards = async (base64: string): Promise<void> => {
     setLoading(true);
 
     const url = IsMobile()
-      ? "http://192.168.1.17:3333/scanner"
+      ? "http://192.168.1.20:3333/scanner"
       : "http://localhost:3333/scanner";
 
-    const request = await fetch(url, {
-      method: "POST",
-      body: JSON.stringify({
-        image: base64,
-      }),
-    });
+    try {
+      const request = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+          image: base64,
+        }),
+      });
 
-    const data = await request.json();
-    setData(data);
-
-    setLoading(false);
+      const data = await request.json();
+      setData(data);
+      toast({ description: "Succefully scanned" });
+    } catch (err) {
+      toast({
+        description: "Error during scann \n" + err,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const SendConfirmation = async () => {
+  const SendConfirmation = async (index: number) => {
     const url = IsMobile()
       ? "http://192.168.1.17:3333/add"
       : "http://localhost:3333/add";
 
-    await fetch(url, {
-      method: "POST",
-      body: JSON.stringify({
-        id: data!.id,
-        index: selected,
-      }),
-    });
+    const confirmation: Confirmation = {
+      id: data!.id,
+      index: index,
+    };
 
-    setData(undefined);
+    try {
+      await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(confirmation),
+      });
+      toast({ description: "Succefully added" });
+    } catch (err) {
+      toast({
+        description: "Error during add " + err,
+        variant: "destructive",
+      });
+    } finally {
+      setData(undefined);
+    }
   };
-
-  const GetSelected = () => {
-    return selected;
-  };
-
-  const SetSelected = (index: number) => setSelected(index);
 
   const GetLoading = () => {
     return loading;
@@ -114,8 +130,6 @@ export function CardProvider({ children }: CardProviderProps) {
     <CardContext.Provider
       value={{
         SendConfirmation,
-        GetSelected,
-        SetSelected,
         GetImages,
         GetLoading,
         SetLoading,

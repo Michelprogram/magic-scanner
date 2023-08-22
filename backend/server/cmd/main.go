@@ -16,6 +16,7 @@ func main() {
 
 	mux.HandleFunc("/scanner", handlers.Scanner)
 	mux.HandleFunc("/add", handlers.Add)
+	mux.HandleFunc("/hello", handlers.Hello)
 
 	handler := cors.Default().Handler(mux)
 
