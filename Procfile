@@ -1,1 +1,0 @@
-web: go run backend/server/cmd/main.go

@@ -17,4 +17,4 @@ WORKDIR /root/
 
 COPY --from=builder /app/server/app .
 
-CMD ["./app"]
+CMD ./app -p $PORT
