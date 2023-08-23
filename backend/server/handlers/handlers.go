@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"sync"
@@ -52,26 +51,27 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/* 	vision := api.NewVision(VISION_TOKEN)
+	vision := vision.NewVision(VISION_TOKEN)
 
-	   	res, err := vision.OCR(payload.Image)
+	VisionResult, err := vision.OCR(payload.Image)
 
-	   	if err != nil {
-	   		http.Error(w, "Vison OCR error "+err.Error(), http.StatusBadRequest)
-	   		return
-	   	} */
+	if err != nil {
+		http.Error(w, "Vison OCR error "+err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	//Mock
-	jsonFile, _ := os.Open("data.json")
-	defer jsonFile.Close()
+	/* 	jsonFile, _ := os.Open("data.json")
+	   	defer jsonFile.Close()
 
-	bytes, _ := io.ReadAll(jsonFile)
+	   	bytes, _ := io.ReadAll(jsonFile)
 
-	var VisionResult vision.VisionResult
+	   	var VisionResult vision.VisionResult
 
-	json.Unmarshal(bytes, &VisionResult)
+	   	json.Unmarshal(bytes, &VisionResult)
+	*/
 
-	title := utils.CardTitle(VisionResult)
+	title := utils.CardTitle(*VisionResult)
 
 	w.Header().Set("Content-Type", "application/json")
 

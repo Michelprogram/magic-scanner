@@ -59,7 +59,7 @@ export function CardProvider({ children }: CardProviderProps) {
 
     const url = IsMobile()
       ? "http://192.168.1.20:3333/scanner"
-      : "http://localhost:3333/scanner";
+      : "https://magic-scanner-6f584b30ac80.herokuapp.com/";
 
     try {
       const request = await fetch(url, {

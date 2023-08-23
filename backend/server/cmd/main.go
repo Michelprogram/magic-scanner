@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/michelprogram/magic-scanner/handlers"
 	"github.com/rs/cors"
@@ -14,6 +15,20 @@ func main() {
 	var port int
 	flag.IntVar(&port, "p", 5, "port to run the server on")
 	flag.Parse()
+
+	token := os.Getenv("NOTION_TOKEN")
+
+	if token == "" {
+		fmt.Println("No token found")
+		os.Exit(1)
+	}
+
+	token = os.Getenv("VISION_TOKEN")
+
+	if token == "" {
+		fmt.Println("No token found")
+		os.Exit(1)
+	}
 
 	fmt.Printf("🚀 Lancement de l'api sur le port %d...", port)
 
