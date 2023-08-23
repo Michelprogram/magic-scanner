@@ -22,6 +22,10 @@ func SearchMagicCardByName(name string) (*Cards, error) {
 		return nil, errors.New("invalid JSON payload")
 	}
 
+	if cards.TotalCards == 0 {
+		return nil, errors.New("No cards found")
+	}
+
 	return &cards, nil
 
 }

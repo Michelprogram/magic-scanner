@@ -47,8 +47,6 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("Passed post")
-
 	var payload ImagePayload
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
@@ -65,22 +63,16 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//Mock
-	/* 	jsonFile, _ := os.Open("data.json")
-	   	defer jsonFile.Close()
-
-	   	bytes, _ := io.ReadAll(jsonFile)
-
-	   	var VisionResult vision.VisionResult
-
-	   	json.Unmarshal(bytes, &VisionResult)
-	*/
-
 	title := utils.CardTitle(*VisionResult)
 
 	log.Printf("Title : %s\n", title)
 
-	cards, _ := scryfall.SearchMagicCardByName(title)
+	cards, err := scryfall.SearchMagicCardByName(title)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	id := uuid.New().String()
 
