@@ -26,7 +26,7 @@ func (v *Vision) OCR(base64 string) (*VisionResult, error) {
 		Requests: []Requests{
 			{
 				Image: ImageV{
-					Content: base64[23:],
+					Content: base64,
 				},
 				Features: []Features{
 					{

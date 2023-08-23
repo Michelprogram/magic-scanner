@@ -12,7 +12,7 @@ function App() {
   const { FetchCards, GetLoading } = useCard();
 
   const screenshot = () => {
-    //const CROP = 300;
+    const CROP = 300;
 
     const canvas = document.createElement("canvas");
 
@@ -24,11 +24,13 @@ function App() {
 
     canvas
       .getContext("2d")!
-      .drawImage(video.current!, 0, 0, width, height, 0, 0, width, height);
+      .drawImage(video.current!, 0, 0, width, CROP, 0, 0, width, CROP);
 
     const base64 = canvas.toDataURL("image/jpg");
 
-    FetchCards(base64);
+    const formated = base64.slice(22, base64.length);
+
+    FetchCards(formated);
   };
 
   useEffect(() => {
