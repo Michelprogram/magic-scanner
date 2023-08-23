@@ -1,6 +1,3 @@
 build:
-  config:
-    NOTION_TOKEN: "secret_rsMBrVPxnAu5y5hPE31F1cMAW4DPWeHOH2xFlQEq052"
-    VISION_TOKEN: "AIzaSyDI6Es5w6Kdv_0C7iFklhzuE3NNFrYi0Aw"
   docker:
     web: backend/Dockerfile

@@ -26,7 +26,7 @@ func (v *Vision) OCR(base64 string) (*VisionResult, error) {
 		Requests: []Requests{
 			{
 				Image: ImageV{
-					Content: base64[22:],
+					Content: base64[23:],
 				},
 				Features: []Features{
 					{
@@ -54,17 +54,15 @@ func (v *Vision) OCR(base64 string) (*VisionResult, error) {
 	}
 	defer res.Body.Close()
 
+	if res.StatusCode != 200 {
+		body, _ = io.ReadAll(res.Body)
+		return nil, errors.New("Error while ask vision OCR " + string(body))
+	}
+
 	var result VisionResult
 	err = json.NewDecoder(res.Body).Decode(&result)
 	if err != nil {
 		return nil, err
-	}
-	body, _ = io.ReadAll(res.Body)
-
-	fmt.Println(string(body), res.StatusCode)
-
-	if res.StatusCode != 200 {
-		return nil, errors.New(string(body))
 	}
 
 	return &result, nil
