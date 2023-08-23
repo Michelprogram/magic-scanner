@@ -56,16 +56,9 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Passed decode start with :  %s\n", payload.Image[:23])
-
 	vision := vision.NewVision(VISION_TOKEN)
-	log.Printf("Vision object :  %s\n", vision.Token)
 
 	VisionResult, err := vision.OCR(payload.Image)
-
-	log.Printf("Vision result :  %s\n", len(VisionResult.Responses))
-
-	log.Printf("Vision error :  %s\n", err.Error())
 
 	if err != nil {
 		http.Error(w, "Vison OCR error "+err.Error(), http.StatusBadRequest)
@@ -84,6 +77,8 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 	*/
 
 	title := utils.CardTitle(*VisionResult)
+
+	log.Printf("Title : %s\n", title)
 
 	cards, _ := scryfall.SearchMagicCardByName(title)
 
