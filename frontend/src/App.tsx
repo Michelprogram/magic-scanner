@@ -12,12 +12,12 @@ function App() {
 
   const [selected, setSelected] = useState(false);
 
-  const [sw, setSwitch] = useState("EN");
+  const [language, setLanguage] = useState("EN");
 
   const { FetchCards, GetLoading } = useCard();
 
   const changeSwitch = () => {
-    setSwitch(sw == "FR" ? "EN" : "FR");
+    setLanguage(language == "FR" ? "EN" : "FR");
   };
 
   const screenshot = () => {
@@ -39,7 +39,7 @@ function App() {
 
     const formated = base64.slice(22, base64.length);
 
-    FetchCards(formated);
+    FetchCards(formated, language);
   };
 
   useEffect(() => {
@@ -58,7 +58,7 @@ function App() {
         <div className="flex flex-col items-center gap-5">
           <div className="flex items-center gap-2">
             <Switch id="language-mode" onClick={changeSwitch} />
-            <Label htmlFor="language-mode">{sw}</Label>
+            <Label htmlFor="language-mode">{language}</Label>
           </div>
           <Button onClick={screenshot} disabled={selected}>
             Flash the card

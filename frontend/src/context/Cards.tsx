@@ -31,7 +31,7 @@ type CardContext = {
   GetImages(): string[];
 
   SendConfirmation(index: number): void;
-  FetchCards(base64: string): Promise<void>;
+  FetchCards(base64: string, language: string): Promise<void>;
 
   GetLoading(): boolean;
   SetLoading(loading: boolean): void;
@@ -53,7 +53,10 @@ export function CardProvider({ children }: CardProviderProps) {
     setData(undefined);
   };
 
-  const FetchCards = async (base64: string): Promise<void> => {
+  const FetchCards = async (
+    base64: string,
+    language: string
+  ): Promise<void> => {
     setLoading(true);
 
     const url = "/v1/scanner";
@@ -63,6 +66,7 @@ export function CardProvider({ children }: CardProviderProps) {
         method: "POST",
         body: JSON.stringify({
           image: base64,
+          language: language,
         }),
         mode: "no-cors",
       });

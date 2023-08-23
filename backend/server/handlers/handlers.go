@@ -20,7 +20,8 @@ var NOTION_TOKEN = os.Getenv("NOTION_TOKEN")
 var VISION_TOKEN = os.Getenv("VISION_TOKEN")
 
 type ImagePayload struct {
-	Image string `json:"image"`
+	Image    string `json:"image"`
+	Language string `json:"language"`
 }
 
 type AddPayload struct {
@@ -69,7 +70,7 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cards, err := scryfall.SearchMagicCardByName(title)
+	cards, err := scryfall.SearchMagicCardByName(title, payload.Language)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
