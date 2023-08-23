@@ -1,0 +1,8 @@
+{
+    "rewrites": [
+      {
+        "source": "/v1/:path*",
+        "destination": "https://magic-scanner-6f584b30ac80.herokuapp.com/v1:/path*"
+      }
+    ]
+  }
