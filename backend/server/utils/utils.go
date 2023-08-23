@@ -1,19 +1,27 @@
 package utils
 
-import "github.com/michelprogram/magic-scanner/api/vision"
+import (
+	"log"
+	"strings"
+
+	"github.com/michelprogram/magic-scanner/api/vision"
+)
 
 func CardTitle(vision vision.VisionResult) string {
 
-	blocks := vision.Responses[0].FullTextAnnotation.Pages[0].Blocks[0]
-	title := ""
+	textAnnotations := vision.Responses[0].TextAnnotations
 
-	for _, paragraph := range blocks.Paragraphs {
-		for _, word := range paragraph.Words {
-			for _, symbol := range word.Symbols {
-				title += symbol.Text
-			}
-		}
+	if len(textAnnotations) == 0 {
+		return ""
 	}
 
-	return title
+	log.Println(textAnnotations[0].Description)
+
+	blocks := textAnnotations[0].Description
+
+	cut := strings.Split(blocks, "\n")
+
+	log.Printf("Size %d\n", len(cut))
+
+	return cut[0]
 }
