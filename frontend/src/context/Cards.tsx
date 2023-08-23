@@ -76,6 +76,7 @@ export function CardProvider({ children }: CardProviderProps) {
         variant: "destructive",
         className: "sm:left-0 left-0",
       });
+      console.warn(err);
     } finally {
       setLoading(false);
     }

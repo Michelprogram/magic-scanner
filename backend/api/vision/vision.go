@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -62,6 +63,7 @@ func (v *Vision) OCR(base64 string) (*VisionResult, error) {
 	var result VisionResult
 	err = json.NewDecoder(res.Body).Decode(&result)
 	if err != nil {
+		log.Println("Error : ", err)
 		return nil, err
 	}
 

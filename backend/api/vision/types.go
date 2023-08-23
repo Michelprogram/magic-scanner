@@ -16,6 +16,7 @@ type Requests struct {
 	Features []Features `json:"features"`
 }
 
+//RES
 type VisionResult struct {
 	Responses []Responses `json:"responses"`
 }
