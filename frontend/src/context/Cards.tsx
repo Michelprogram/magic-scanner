@@ -1,5 +1,4 @@
 import { useContext, createContext, useState } from "react";
-import { IsMobile } from "../utils/utils";
 import { useToast } from "../components/ui/use-toast";
 
 type CardProviderProps = {
