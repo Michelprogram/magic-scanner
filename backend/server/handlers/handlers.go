@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"sync"
@@ -65,7 +64,10 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 
 	title := utils.CardTitle(*VisionResult)
 
-	log.Printf("Title : %s\n", title)
+	if title == "" {
+		http.Error(w, "No card title found", http.StatusBadRequest)
+		return
+	}
 
 	cards, err := scryfall.SearchMagicCardByName(title)
 

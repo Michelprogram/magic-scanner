@@ -30,7 +30,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("🚀 Lancement de l'api sur le port %d...", port)
+	fmt.Printf("🚀 Lancement de l'api sur le port %d...\n", port)
 
 	mux := http.NewServeMux()
 
