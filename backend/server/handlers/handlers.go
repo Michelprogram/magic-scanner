@@ -105,7 +105,7 @@ func Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	card := response.(Response).Cards.Data[payload.Index]
+	card := response.(*Response).Cards.Data[payload.Index]
 
 	notion := notion.NewNotion(NOTION_TOKEN, "7ed3432e626d439597fac0810734b5dd")
 

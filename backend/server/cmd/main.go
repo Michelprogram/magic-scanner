@@ -34,9 +34,9 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/scanner", handlers.Scanner)
-	mux.HandleFunc("/add", handlers.Add)
-	mux.HandleFunc("/hello", handlers.Hello)
+	mux.HandleFunc("/v1/scanner", handlers.Scanner)
+	mux.HandleFunc("/v1/add", handlers.Add)
+	mux.HandleFunc("/v1/hello", handlers.Hello)
 
 	handler := cors.Default().Handler(mux)
 

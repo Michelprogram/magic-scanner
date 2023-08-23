@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev:http": "APP_ENV=NONE vite",
-    "dev:https": "APP_ENV=DEV vite --https",
+    "dev:http": "APP_ENV=DEV vite",
+    "dev:https": "APP_ENV=MOBILE vite --https --host",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"

@@ -56,16 +56,12 @@ const Video: FC<props> = ({ video }) => {
       {error != "" ? (
         <p className="font-bold m-auto p-10 w-3/4 text-center">{error}</p>
       ) : (
-        <div>
+        <div className={classNameLoading()}>
           <video
             ref={video}
             autoPlay
             playsInline
-            className={
-              "rounded-lg " +
-              classNameLoading() +
-              hidden(GetImages().length > 0)
-            }
+            className={"rounded-lg " + hidden(GetImages().length > 0)}
           />
           <Carousel className={hidden(GetImages().length == 0)} />
         </div>

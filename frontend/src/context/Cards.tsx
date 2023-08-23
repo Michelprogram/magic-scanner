@@ -56,7 +56,7 @@ export function CardProvider({ children }: CardProviderProps) {
   const FetchCards = async (base64: string): Promise<void> => {
     setLoading(true);
 
-    const url = "https://magic-scanner-6f584b30ac80.herokuapp.com/scanner";
+    const url = "/v1/scanner";
 
     try {
       const request = await fetch(url, {
@@ -69,11 +69,12 @@ export function CardProvider({ children }: CardProviderProps) {
 
       const data = await request.json();
       setData(data);
-      toast({ description: "Succefully scanned" });
+      toast({ description: "Succefully scanned", className: "top center" });
     } catch (err) {
       toast({
         description: "Error during scann \n" + err,
         variant: "destructive",
+        className: "sm:left-0 left-0",
       });
     } finally {
       setLoading(false);
@@ -81,7 +82,9 @@ export function CardProvider({ children }: CardProviderProps) {
   };
 
   const SendConfirmation = async (index: number) => {
-    const url = "https://magic-scanner-6f584b30ac80.herokuapp.com/add";
+    setLoading(true);
+
+    const url = "/v1/add";
 
     const confirmation: Confirmation = {
       id: data!.id,
@@ -102,6 +105,7 @@ export function CardProvider({ children }: CardProviderProps) {
       });
     } finally {
       setData(undefined);
+      setLoading(false);
     }
   };
 
