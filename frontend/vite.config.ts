@@ -28,9 +28,11 @@ export default ({ mode }) => {
       },
     };
   } else {
-    conf.server.proxy = {
-      "/v1": {
-        target: "https://magic-scanner-6f584b30ac80.herokuapp.com",
+    conf.server = {
+      proxy: {
+        "/v1": {
+          target: "https://magic-scanner-6f584b30ac80.herokuapp.com",
+        },
       },
     };
   }
