@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"sync"
@@ -39,10 +40,14 @@ func Hello(w http.ResponseWriter, r *http.Request) {
 
 func Scanner(w http.ResponseWriter, r *http.Request) {
 
+	w.Header().Set("Content-Type", "application/json")
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST requests are allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
+	log.Println("Passed post")
 
 	var payload ImagePayload
 	err := json.NewDecoder(r.Body).Decode(&payload)
@@ -51,9 +56,16 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("Passed decode start with :  %s\n", payload.Image[:23])
+
 	vision := vision.NewVision(VISION_TOKEN)
+	log.Printf("Vision object :  %s\n", vision.Token)
 
 	VisionResult, err := vision.OCR(payload.Image)
+
+	log.Printf("Vision result :  %s\n", len(VisionResult.Responses))
+
+	log.Printf("Vision error :  %s\n", err.Error())
 
 	if err != nil {
 		http.Error(w, "Vison OCR error "+err.Error(), http.StatusBadRequest)
@@ -72,8 +84,6 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 	*/
 
 	title := utils.CardTitle(*VisionResult)
-
-	w.Header().Set("Content-Type", "application/json")
 
 	cards, _ := scryfall.SearchMagicCardByName(title)
 
