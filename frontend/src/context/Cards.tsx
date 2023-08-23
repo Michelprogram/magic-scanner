@@ -57,9 +57,7 @@ export function CardProvider({ children }: CardProviderProps) {
   const FetchCards = async (base64: string): Promise<void> => {
     setLoading(true);
 
-    const url = IsMobile()
-      ? "http://192.168.1.20:3333/scanner"
-      : "https://magic-scanner-6f584b30ac80.herokuapp.com/";
+    const url = "https://magic-scanner-6f584b30ac80.herokuapp.com/scanner";
 
     try {
       const request = await fetch(url, {
@@ -67,6 +65,7 @@ export function CardProvider({ children }: CardProviderProps) {
         body: JSON.stringify({
           image: base64,
         }),
+        mode: "no-cors",
       });
 
       const data = await request.json();
@@ -83,9 +82,7 @@ export function CardProvider({ children }: CardProviderProps) {
   };
 
   const SendConfirmation = async (index: number) => {
-    const url = IsMobile()
-      ? "http://192.168.1.17:3333/add"
-      : "http://localhost:3333/add";
+    const url = "https://magic-scanner-6f584b30ac80.herokuapp.com/add";
 
     const confirmation: Confirmation = {
       id: data!.id,
@@ -96,6 +93,7 @@ export function CardProvider({ children }: CardProviderProps) {
       await fetch(url, {
         method: "POST",
         body: JSON.stringify(confirmation),
+        mode: "no-cors",
       });
       toast({ description: "Succefully added" });
     } catch (err) {
