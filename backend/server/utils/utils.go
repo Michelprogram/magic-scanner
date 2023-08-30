@@ -15,13 +15,11 @@ func CardTitle(vision vision.VisionResult) string {
 		return ""
 	}
 
-	log.Println(textAnnotations[0].Description)
-
 	blocks := textAnnotations[0].Description
 
 	cut := strings.Split(blocks, "\n")
 
-	log.Printf("Size %d\n", len(cut))
+	log.Printf("Card name : %s\n", cut[0])
 
 	return cut[0]
 }

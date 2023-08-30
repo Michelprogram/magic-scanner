@@ -6,6 +6,7 @@
   "scripts": {
     "dev:http": "APP_ENV=DEV vite",
     "dev:https": "APP_ENV=MOBILE vite --https --host",
+    "dev:backend": "cd ../backend/server && go run cmd/main.go -p 3333",
     "generate-pwa-assets": "pwa-assets-generator --preset android public/gollum.svg",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

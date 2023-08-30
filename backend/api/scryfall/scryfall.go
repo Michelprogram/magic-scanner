@@ -11,7 +11,7 @@ import (
 )
 
 func SearchMagicCardByName(name string, language string) (*Cards, error) {
-	url := fmt.Sprintf("https://api.scryfall.com/cards/search?q=%s&lang=%s&unique=prints", url.QueryEscape(name), strings.ToLower(language))
+	url := fmt.Sprintf("https://api.scryfall.com/cards/search?&unique=prints&q=%s+lang%%3A%s", url.QueryEscape(name), strings.ToLower(language))
 	resp, err := http.Get(url)
 
 	if err != nil {
