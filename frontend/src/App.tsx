@@ -49,9 +49,7 @@ function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <div className="flex w-3/4 m-auto gap-6 flex-col items-center pt-10">
-        <h1 className="text-3xl font-bold text-center">
-          Magic the gathering scanner
-        </h1>
+        <h1 className="text-3xl font-bold text-center">Magic scanner</h1>
         <div className="h-fit">
           <Video video={video} />
         </div>
