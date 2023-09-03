@@ -85,6 +85,7 @@ VISION_TOKEN=key
 This tokens could be found here for <a href="https://developers.notion.com/docs/create-a-notion-integration">Notion Token</a> and here for <a href="https://cloud.google.com/vision/docs/drag-and-drop?hl=fr">OCR Vision</a>.
 
 The backend is hosted on heroku and the frontend on vercel.
+You can find the notion <a href="https://gauron-dorian.notion.site/7ed3432e626d439597fac0810734b5dd?v=8328af8172cf4d0f8ab00bdcb2db75d5&pvs=4">here</a>
 
 
 <p align="right"><a href="#top">⬆️</a></p>
