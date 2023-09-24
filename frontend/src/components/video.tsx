@@ -9,7 +9,7 @@ interface props {
 
 const Video: FC<props> = ({ video }) => {
   const [error, setError] = useState<string>("");
-  const { GetLoading, GetImages } = useCard();
+  const { isLoading, GetImages } = useCard();
 
   const constraints: MediaStreamConstraints = {
     video: {
@@ -40,7 +40,7 @@ const Video: FC<props> = ({ video }) => {
   };
 
   const classNameLoading = () => {
-    return GetLoading() ? "animate-pulse" : "";
+    return isLoading() ? "animate-pulse" : "";
   };
 
   const hidden = (condition: boolean) => {

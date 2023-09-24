@@ -12,9 +12,11 @@ function App() {
 
   const [selected, setSelected] = useState(false);
 
+  const [flashing, setFlashing] = useState(true);
+
   const [language, setLanguage] = useState("EN");
 
-  const { FetchCards, GetLoading } = useCard();
+  const { FetchCards, isLoading, SetLoading, Clear } = useCard();
 
   const changeSwitch = () => {
     setLanguage(language == "FR" ? "EN" : "FR");
@@ -39,12 +41,37 @@ function App() {
 
     const formated = base64.slice(22, base64.length);
 
-    FetchCards(formated, language);
+    FetchCards(formated, language)
+      .then(() => setFlashing(false))
+      .catch(() => setFlashing(true));
+  };
+
+  const buttonBehavior = () => {
+    if (flashing) {
+      return (
+        <Button onClick={screenshot} disabled={selected}>
+          Flash the card
+        </Button>
+      );
+    }
+
+    return (
+      <Button
+        variant={"destructive"}
+        onClick={() => {
+          setFlashing(true);
+          Clear();
+          SetLoading(false);
+        }}
+      >
+        Cancel
+      </Button>
+    );
   };
 
   useEffect(() => {
-    setSelected(GetLoading);
-  }, [GetLoading]);
+    setSelected(isLoading);
+  }, [isLoading]);
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -58,12 +85,10 @@ function App() {
             <Switch id="language-mode" onClick={changeSwitch} />
             <Label htmlFor="language-mode">{language}</Label>
           </div>
-          <Button onClick={screenshot} disabled={selected}>
-            Flash the card
-          </Button>
+          {buttonBehavior()}
         </div>
-        <Toaster />
       </div>
+      <Toaster />
     </ThemeProvider>
   );
 }

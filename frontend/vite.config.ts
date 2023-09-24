@@ -61,7 +61,7 @@ export default ({ mode }) => {
       https: true,
       proxy: {
         "/v1": {
-          target: "http://192.168.1.17:3333",
+          target: "http://192.168.1.20:3333",
         },
       },
     };

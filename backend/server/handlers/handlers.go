@@ -43,14 +43,14 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Only POST requests are allowed", http.StatusMethodNotAllowed)
+		utils.JSONError(w, utils.HttpError{Message: "Only POST requests are allowed", Code: http.StatusMethodNotAllowed})
 		return
 	}
 
 	var payload ImagePayload
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
-		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		utils.JSONError(w, utils.HttpError{Message: "Invalid JSON payload", Code: http.StatusBadRequest})
 		return
 	}
 
@@ -59,21 +59,22 @@ func Scanner(w http.ResponseWriter, r *http.Request) {
 	VisionResult, err := vision.OCR(payload.Image)
 
 	if err != nil {
-		http.Error(w, "Vison OCR error "+err.Error(), http.StatusBadRequest)
+		utils.JSONError(w, utils.HttpError{Message: "Vison OCR error " + err.Error(), Code: http.StatusBadRequest})
 		return
 	}
 
 	title := utils.CardTitle(*VisionResult)
 
 	if title == "" {
-		http.Error(w, "No card title found", http.StatusBadRequest)
+
+		utils.JSONError(w, utils.HttpError{Message: "No card title found", Code: http.StatusBadRequest})
 		return
 	}
 
 	cards, err := scryfall.SearchMagicCardByName(title, payload.Language)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.JSONError(w, utils.HttpError{Message: err.Error(), Code: http.StatusBadRequest})
 		return
 	}
 
@@ -97,14 +98,14 @@ func Add(w http.ResponseWriter, r *http.Request) {
 	var payload AddPayload
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
-		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+		utils.JSONError(w, utils.HttpError{Message: "Invalid JSON payload", Code: http.StatusBadRequest})
 		return
 	}
 
 	response, ok := storage.Load(payload.Id)
 
 	if !ok {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		utils.JSONError(w, utils.HttpError{Message: "Invalid ID", Code: http.StatusBadRequest})
 		return
 	}
 
@@ -115,12 +116,11 @@ func Add(w http.ResponseWriter, r *http.Request) {
 	err = notion.AddCard(card)
 
 	if err != nil {
-		http.Error(w, "Error while adding to notion", http.StatusBadRequest)
+		utils.JSONError(w, utils.HttpError{Message: "Error while adding to notion", Code: http.StatusBadRequest})
 		return
 	}
 
 	storage.Delete(payload.Id)
 
 	fmt.Fprintf(w, "Added")
-
 }

@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { useCard } from "../context/Cards";
+import { useCard, type Price } from "../context/Cards";
 import { Button } from "./ui/button";
 import { ChevronRightIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 
@@ -8,8 +8,9 @@ interface Props {
 }
 
 const Carousel: FC<Props> = ({ className }) => {
-  const { GetImages, SendConfirmation } = useCard();
+  const { GetImages, SendConfirmation, GetPrices } = useCard();
   const [images, setImages] = useState<string[]>([]);
+  const [prices, setPrices] = useState<Price[]>([]);
   const [index, setIndex] = useState<number>(0);
 
   const handleNext = () => {
@@ -20,19 +21,29 @@ const Carousel: FC<Props> = ({ className }) => {
     setIndex(index === 0 ? images.length - 1 : index - 1);
   };
 
-  const cssSpan = (selected: number) => {
-    return selected == index ? "bg-slate-500" : "bg-white";
-  };
-
   const sendImage = (event: React.MouseEvent<HTMLImageElement>) => {
     if (event.detail == 2) {
       SendConfirmation(index);
     }
   };
 
+  const displayPrices = () => {
+    if (prices.length == 0) return "";
+
+    if (prices[index].eur !== "") return prices[index].eur + " €";
+    if (prices[index].eur_foil !== "")
+      return prices[index].eur_foil + " € (foil)";
+    if (prices[index].usd !== "") return prices[index].usd + " $";
+    if (prices[index].usd_foil !== "")
+      return prices[index].usd_foil + " $ (foil)";
+
+    return "Price not found";
+  };
+
   useEffect(() => {
     setImages(GetImages());
-  }, [GetImages]);
+    setPrices(GetPrices());
+  }, [GetImages, GetPrices]);
 
   return (
     <div className={"relative" + className}>
@@ -56,16 +67,13 @@ const Carousel: FC<Props> = ({ className }) => {
           <ChevronRightIcon className="h-8 w-8 font-bold text-black" />
         </Button>
         <div className="absolute flex w-full items-center justify-center gap-3 left-0 right-0 bottom-1">
-          {images.map((_, index) => (
-            <span
-              key={index}
-              className={
-                "rounded-full w-2 h-2 block transition-bg ease-in-out duration-500 " +
-                cssSpan(index)
-              }
-            ></span>
-          ))}
+          <p>
+            {index + 1}/{images.length}
+          </p>
         </div>
+      </div>
+      <div className="flex gap-2 mt-5 w-full items-center justify-center">
+        <span className="text-lg font-bold">{displayPrices()}</span>
       </div>
     </div>
   );

@@ -5,12 +5,20 @@ type CardProviderProps = {
   children: React.ReactNode;
 };
 
+export type Price = {
+  usd: string;
+  usd_foil: string;
+  eur: string;
+  eur_foil: string;
+};
+
 type Card = {
   image_uris: {
     small: string;
     normal: string;
     png: string;
   };
+  prices: Price;
 };
 
 type Confirmation = {
@@ -29,11 +37,12 @@ type CardContext = {
   Clear(): void;
   GetCards(): Card[];
   GetImages(): string[];
+  GetPrices(): Price[];
 
   SendConfirmation(index: number): void;
   FetchCards(base64: string, language: string): Promise<void>;
 
-  GetLoading(): boolean;
+  isLoading(): boolean;
   SetLoading(loading: boolean): void;
 };
 
@@ -61,29 +70,30 @@ export function CardProvider({ children }: CardProviderProps) {
 
     const url = "/v1/scanner";
 
-    try {
-      const request = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify({
-          image: base64,
-          language: language,
-        }),
-        mode: "no-cors",
-      });
+    const request = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify({
+        image: base64,
+        language: language,
+      }),
+      mode: "no-cors",
+    });
 
-      const data = await request.json();
-      setData(data);
-      toast({ description: "Succefully scanned", className: "top center" });
-    } catch (err) {
+    setLoading(false);
+    const data = await request.json();
+
+    if (!request.ok) {
       toast({
-        description: "Error during scann \n" + err,
+        description: "Error during scan : " + data.message,
         variant: "destructive",
         className: "sm:left-0 left-0",
       });
-      console.warn(err);
-    } finally {
-      setLoading(false);
+
+      throw data.message;
     }
+
+    setData(data);
+    toast({ description: "Succefully scanned", className: "top center" });
   };
 
   const SendConfirmation = async (index: number) => {
@@ -96,25 +106,30 @@ export function CardProvider({ children }: CardProviderProps) {
       index: index,
     };
 
-    try {
-      await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(confirmation),
-        mode: "no-cors",
-      });
-      toast({ description: "Succefully added" });
-    } catch (err) {
+    const request = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(confirmation),
+      mode: "no-cors",
+    });
+
+    const js = await request.json();
+
+    setData(undefined);
+    setLoading(false);
+
+    if (!request.ok) {
       toast({
-        description: "Error during add " + err,
+        description: "Error during add " + js.message,
         variant: "destructive",
       });
-    } finally {
-      setData(undefined);
-      setLoading(false);
+
+      throw js.message;
     }
+
+    toast({ description: "Succefully added" });
   };
 
-  const GetLoading = () => {
+  const isLoading = () => {
     return loading;
   };
 
@@ -128,16 +143,22 @@ export function CardProvider({ children }: CardProviderProps) {
   };
 
   const GetImages = () => {
-    if (data == undefined) return [];
+    if (data == undefined || data.cards == undefined) return [];
     return data.cards.data.map((card) => card.image_uris.normal);
+  };
+
+  const GetPrices = () => {
+    if (data == undefined || data.cards == undefined) return [];
+    return data.cards.data.map((card) => card.prices);
   };
 
   return (
     <CardContext.Provider
       value={{
+        GetPrices,
         SendConfirmation,
         GetImages,
-        GetLoading,
+        isLoading,
         SetLoading,
         Clear,
         GetCards,

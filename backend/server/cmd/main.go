@@ -45,6 +45,6 @@ func main() {
 	err := http.ListenAndServe(expose, handler)
 
 	if err != nil {
-		fmt.Println("Can't run website")
+		fmt.Printf("Can't run api : %s\n", err.Error())
 	}
 }
