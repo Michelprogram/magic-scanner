@@ -39,7 +39,7 @@ type CardContext = {
   GetImages(): string[];
   GetPrices(): Price[];
 
-  SendConfirmation(index: number): void;
+  SendConfirmation(index: number): Promise<void>;
   FetchCards(base64: string, language: string): Promise<void>;
 
   isLoading(): boolean;
@@ -86,17 +86,17 @@ export function CardProvider({ children }: CardProviderProps) {
       toast({
         description: "Error during scan : " + data.message,
         variant: "destructive",
-        className: "sm:left-0 left-0",
+        duration: 3000,
       });
 
       throw data.message;
     }
 
     setData(data);
-    toast({ description: "Succefully scanned", className: "top center" });
+    toast({ description: "Succefully scanned", duration: 1000 });
   };
 
-  const SendConfirmation = async (index: number) => {
+  const SendConfirmation = async (index: number): Promise<void> => {
     setLoading(true);
 
     const url = "/v1/add";
@@ -114,19 +114,20 @@ export function CardProvider({ children }: CardProviderProps) {
 
     const js = await request.json();
 
-    setData(undefined);
     setLoading(false);
 
     if (!request.ok) {
       toast({
         description: "Error during add " + js.message,
         variant: "destructive",
+        duration: 3000,
       });
 
       throw js.message;
     }
 
-    toast({ description: "Succefully added" });
+    setData(undefined);
+    toast({ description: "Succefully added", duration: 1000 });
   };
 
   const isLoading = () => {

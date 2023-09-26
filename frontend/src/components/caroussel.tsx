@@ -3,12 +3,13 @@ import { useCard, type Price } from "../context/Cards";
 import { Button } from "./ui/button";
 import { ChevronRightIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 
-interface Props {
-  className: string;
-}
+type props = {
+  setFlashing: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-const Carousel: FC<Props> = ({ className }) => {
-  const { GetImages, SendConfirmation, GetPrices } = useCard();
+const Carousel: FC<props> = ({ setFlashing }) => {
+  const { GetImages, GetPrices, SendConfirmation, Clear, isLoading } =
+    useCard();
   const [images, setImages] = useState<string[]>([]);
   const [prices, setPrices] = useState<Price[]>([]);
   const [index, setIndex] = useState<number>(0);
@@ -23,7 +24,9 @@ const Carousel: FC<Props> = ({ className }) => {
 
   const sendImage = (event: React.MouseEvent<HTMLImageElement>) => {
     if (event.detail == 2) {
-      SendConfirmation(index);
+      SendConfirmation(index)
+        .then(() => setFlashing(true))
+        .catch(() => setFlashing(false));
     }
   };
 
@@ -46,7 +49,11 @@ const Carousel: FC<Props> = ({ className }) => {
   }, [GetImages, GetPrices]);
 
   return (
-    <div className={"relative" + className}>
+    <div
+      className={`${
+        isLoading() ? "animate-pulse" : ""
+      } flex flex-col items-center gap-3`}
+    >
       <div className="relative">
         <img
           src={images[index]}
@@ -75,6 +82,15 @@ const Carousel: FC<Props> = ({ className }) => {
       <div className="flex gap-2 mt-5 w-full items-center justify-center">
         <span className="text-lg font-bold">{displayPrices()}</span>
       </div>
+      <Button
+        variant={"destructive"}
+        onClick={() => {
+          setFlashing(true);
+          Clear();
+        }}
+      >
+        Cancel
+      </Button>
     </div>
   );
 };

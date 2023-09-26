@@ -1,15 +1,21 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState, useRef } from "react";
+
 import { IsMobile } from "../utils/utils";
 import { useCard } from "../context/Cards";
-import Carousel from "./caroussel";
+import { Button } from "./ui/button";
+import Language from "./language";
 
-interface props {
-  video: React.RefObject<HTMLVideoElement>;
-}
+type props = {
+  setFlashing: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-const Video: FC<props> = ({ video }) => {
+const Video: FC<props> = ({ setFlashing }) => {
+  const video = useRef<HTMLVideoElement>(null);
+  const [language, setLanguage] = useState("EN");
+
   const [error, setError] = useState<string>("");
-  const { isLoading, GetImages } = useCard();
+
+  const { isLoading, FetchCards } = useCard();
 
   const constraints: MediaStreamConstraints = {
     video: {
@@ -28,6 +34,30 @@ const Video: FC<props> = ({ video }) => {
     audio: false,
   };
 
+  const screenshot = () => {
+    const CROP = 300;
+
+    const canvas = document.createElement("canvas");
+
+    const width = video.current!.videoWidth;
+    const height = video.current!.videoHeight;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    canvas
+      .getContext("2d")!
+      .drawImage(video.current!, 0, 0, width, CROP, 0, 0, width, CROP);
+
+    const base64 = canvas.toDataURL("image/jpg");
+
+    const formated = base64.slice(22, base64.length);
+
+    FetchCards(formated, language)
+      .then(() => setFlashing(false))
+      .catch(() => setFlashing(true));
+  };
+
   const getMedia = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -39,33 +69,37 @@ const Video: FC<props> = ({ video }) => {
     }
   };
 
-  const classNameLoading = () => {
-    return isLoading() ? "animate-pulse" : "";
-  };
-
-  const hidden = (condition: boolean) => {
-    return condition ? " hidden" : "";
-  };
-
   useEffect(() => {
     getMedia();
   }, []);
 
-  return (
-    <div>
-      {error != "" ? (
+  if (error != "") {
+    return (
+      <div>
         <p className="font-bold m-auto p-10 w-3/4 text-center">{error}</p>
-      ) : (
-        <div className={classNameLoading()}>
-          <video
-            ref={video}
-            autoPlay
-            playsInline
-            className={"rounded-lg " + hidden(GetImages().length > 0)}
-          />
-          <Carousel className={hidden(GetImages().length == 0)} />
-        </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`${
+        isLoading() ? "animate-pulse" : ""
+      } flex flex-col items-center gap-6`}
+    >
+      <video
+        ref={video}
+        autoPlay
+        playsInline
+        className={"rounded-lg "}
+        controls={false}
+      />
+      <div className="flex flex-col items-center gap-5">
+        <Language language={language} setLanguage={setLanguage} />
+      </div>
+      <Button onClick={screenshot} disabled={isLoading()}>
+        Flash the card
+      </Button>
     </div>
   );
 };

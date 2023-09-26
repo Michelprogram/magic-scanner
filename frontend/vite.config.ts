@@ -2,12 +2,13 @@ import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import { VitePWA } from "vite-plugin-pwa";
+import Terminal from "vite-plugin-terminal";
 
 export default ({ mode }) => {
   process.env = Object.assign(process.env, loadEnv(mode, process.cwd(), ""));
 
   const conf = defineConfig({
-    plugins: [react()],
+    plugins: [react(), Terminal()],
   });
 
   const assets = [
