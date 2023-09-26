@@ -122,5 +122,11 @@ func Add(w http.ResponseWriter, r *http.Request) {
 
 	storage.Delete(payload.Id)
 
-	fmt.Fprintf(w, "Added")
+	response = map[string]string{
+		"message": fmt.Sprintf("Card %s succefully added.", card.Name),
+	}
+
+	js, _ := json.Marshal(response)
+
+	fmt.Fprintf(w, "%s", js)
 }
